@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install dependencies
+        run: uv sync
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format check
+        run: uv run ruff format --check .
+      - name: Clone demo_nodes_cpp for smoke test
+        run: git clone --depth 1 --branch humble https://github.com/ros2/demos /tmp/ros2_demos
+      - name: Test
+        run: uv run pytest -q
+        env:
+          CIE_DEMO_NODES_CPP: /tmp/ros2_demos

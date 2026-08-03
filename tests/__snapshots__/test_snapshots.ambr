@@ -1,0 +1,148 @@
+# serializer version: 1
+# name: test_inventory_snapshot
+  dict({
+    'nodes': list([
+      dict({
+        'callback_groups': list([
+          dict({
+            'confidence': 'resolved',
+            'id': 'default_group',
+            'members': list([
+              dict({
+                'callback_kind': 'lambda',
+                'confidence': 'resolved',
+                'declared_at': 'src/listener_component.cpp:16',
+                'declared_topic': 'chatter',
+                'kind': 'subscription',
+                'msg_type': 'std_msgs::msg::String',
+                'notes': list([
+                ]),
+              }),
+            ]),
+            'type': 'MutuallyExclusive',
+          }),
+        ]),
+        'executable': 'listener',
+        'kind': 'component',
+        'node_hint': 'Listener',
+        'node_name': 'listener',
+        'package': 'component_pkg',
+        'plugin_class': 'component_pkg::Listener',
+        'publishers': list([
+        ]),
+        'unresolved': list([
+        ]),
+      }),
+      dict({
+        'callback_groups': list([
+          dict({
+            'confidence': 'resolved',
+            'declared_at': 'src/talker.cpp:17',
+            'id': 'sensor_group_',
+            'members': list([
+              dict({
+                'callback': 'Talker::on_scan',
+                'callback_kind': 'bind',
+                'confidence': 'resolved',
+                'declared_at': 'src/talker.cpp:22',
+                'declared_topic': '/scan',
+                'kind': 'subscription',
+                'msg_type': 'sensor_msgs::msg::LaserScan',
+                'notes': list([
+                ]),
+              }),
+            ]),
+            'type': 'MutuallyExclusive',
+          }),
+          dict({
+            'confidence': 'resolved',
+            'declared_at': 'src/talker.cpp:18',
+            'id': 'worker_group_',
+            'members': list([
+              dict({
+                'callback': 'Talker::on_timer',
+                'callback_kind': 'bind',
+                'confidence': 'resolved',
+                'declared_at': 'src/talker.cpp:31',
+                'kind': 'timer',
+                'notes': list([
+                ]),
+                'period': '500ms',
+                'period_ns': 500000000,
+              }),
+            ]),
+            'type': 'Reentrant',
+          }),
+          dict({
+            'confidence': 'resolved',
+            'id': 'default_group',
+            'members': list([
+              dict({
+                'callback_kind': 'lambda',
+                'confidence': 'resolved',
+                'declared_at': 'src/talker.cpp:27',
+                'declared_topic': 'cmd',
+                'kind': 'subscription',
+                'msg_type': 'std_msgs::msg::String',
+                'notes': list([
+                ]),
+              }),
+              dict({
+                'callback': 'Talker::on_add',
+                'callback_kind': 'bind',
+                'confidence': 'resolved',
+                'declared_at': 'src/talker.cpp:34',
+                'declared_topic': 'add_two_ints',
+                'kind': 'service',
+                'msg_type': 'example_interfaces::srv::AddTwoInts',
+                'notes': list([
+                ]),
+              }),
+              dict({
+                'confidence': 'resolved',
+                'declared_at': 'src/talker.cpp:38',
+                'declared_topic': 'add_two_ints',
+                'kind': 'client',
+                'msg_type': 'example_interfaces::srv::AddTwoInts',
+                'notes': list([
+                ]),
+              }),
+            ]),
+            'type': 'MutuallyExclusive',
+          }),
+        ]),
+        'executable': 'talker',
+        'kind': 'executable',
+        'node_hint': 'Talker',
+        'node_name': 'talker',
+        'package': 'demo_pkg',
+        'publishers': list([
+          dict({
+            'confidence': 'resolved',
+            'declared_at': 'src/talker.cpp:40',
+            'declared_topic': 'chatter',
+            'kind': 'publisher',
+            'msg_type': 'std_msgs::msg::String',
+            'notes': list([
+            ]),
+          }),
+        ]),
+        'unresolved': list([
+        ]),
+      }),
+    ]),
+    'scan_unresolved': list([
+    ]),
+    'schema_version': '0.1',
+    'unmatched_launch_nodes': list([
+    ]),
+    'unsupported': list([
+      dict({
+        'declared_at': 'py_pkg',
+        'kind': 'python_node',
+        'reason': "rclpy source analysis is not supported in v1 (entry point 'py_talker = py_pkg.talker:main')",
+      }),
+    ]),
+    'workspace': '<workspace>',
+  })
+# ---

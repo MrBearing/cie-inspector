@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="demo_pkg" exec="talker" name="talker" namespace="/robot1">
+    <remap from="/scan" to="/lidar/scan"/>
+    <remap from="chatter" to="chatter_out"/>
+  </node>
+  <node pkg="component_pkg" exec="listener" name="listener" namespace="/robot1"/>
+  <node pkg="other_pkg" exec="ghost" name="ghost"/>
+</launch>

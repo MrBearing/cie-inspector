@@ -1,0 +1,159 @@
+{
+  "schema_version": "0.1",
+  "workspace": "tests/fixtures/ws_basic",
+  "nodes": [
+    {
+      "package": "component_pkg",
+      "executable": "listener",
+      "kind": "component",
+      "plugin_class": "component_pkg::Listener",
+      "node_hint": "Listener",
+      "node_name": "listener",
+      "launch": {
+        "node_name": "listener",
+        "namespace": "/robot1",
+        "remaps": {}
+      },
+      "callback_groups": [
+        {
+          "id": "default_group",
+          "type": "MutuallyExclusive",
+          "confidence": "resolved",
+          "members": [
+            {
+              "kind": "subscription",
+              "declared_topic": "chatter",
+              "resolved_topic": "/robot1/chatter",
+              "msg_type": "std_msgs::msg::String",
+              "callback_kind": "lambda",
+              "declared_at": "src/listener_component.cpp:16",
+              "confidence": "resolved",
+              "notes": []
+            }
+          ]
+        }
+      ],
+      "publishers": [],
+      "unresolved": []
+    },
+    {
+      "package": "demo_pkg",
+      "executable": "talker",
+      "kind": "executable",
+      "node_hint": "Talker",
+      "node_name": "talker",
+      "launch": {
+        "node_name": "talker",
+        "namespace": "/robot1",
+        "remaps": {
+          "/scan": "/lidar/scan",
+          "chatter": "chatter_out"
+        }
+      },
+      "callback_groups": [
+        {
+          "id": "sensor_group_",
+          "type": "MutuallyExclusive",
+          "declared_at": "src/talker.cpp:17",
+          "confidence": "resolved",
+          "members": [
+            {
+              "kind": "subscription",
+              "declared_topic": "/scan",
+              "resolved_topic": "/lidar/scan",
+              "msg_type": "sensor_msgs::msg::LaserScan",
+              "callback": "Talker::on_scan",
+              "callback_kind": "bind",
+              "declared_at": "src/talker.cpp:22",
+              "confidence": "resolved",
+              "notes": []
+            }
+          ]
+        },
+        {
+          "id": "worker_group_",
+          "type": "Reentrant",
+          "declared_at": "src/talker.cpp:18",
+          "confidence": "resolved",
+          "members": [
+            {
+              "kind": "timer",
+              "callback": "Talker::on_timer",
+              "callback_kind": "bind",
+              "period": "500ms",
+              "period_ns": 500000000,
+              "declared_at": "src/talker.cpp:31",
+              "confidence": "resolved",
+              "notes": []
+            }
+          ]
+        },
+        {
+          "id": "default_group",
+          "type": "MutuallyExclusive",
+          "confidence": "resolved",
+          "members": [
+            {
+              "kind": "subscription",
+              "declared_topic": "cmd",
+              "resolved_topic": "/robot1/cmd",
+              "msg_type": "std_msgs::msg::String",
+              "callback_kind": "lambda",
+              "declared_at": "src/talker.cpp:27",
+              "confidence": "resolved",
+              "notes": []
+            },
+            {
+              "kind": "service",
+              "declared_topic": "add_two_ints",
+              "resolved_topic": "/robot1/add_two_ints",
+              "msg_type": "example_interfaces::srv::AddTwoInts",
+              "callback": "Talker::on_add",
+              "callback_kind": "bind",
+              "declared_at": "src/talker.cpp:34",
+              "confidence": "resolved",
+              "notes": []
+            },
+            {
+              "kind": "client",
+              "declared_topic": "add_two_ints",
+              "resolved_topic": "/robot1/add_two_ints",
+              "msg_type": "example_interfaces::srv::AddTwoInts",
+              "declared_at": "src/talker.cpp:38",
+              "confidence": "resolved",
+              "notes": []
+            }
+          ]
+        }
+      ],
+      "publishers": [
+        {
+          "kind": "publisher",
+          "declared_topic": "chatter",
+          "resolved_topic": "chatter_out",
+          "msg_type": "std_msgs::msg::String",
+          "declared_at": "src/talker.cpp:40",
+          "confidence": "resolved",
+          "notes": []
+        }
+      ],
+      "unresolved": []
+    }
+  ],
+  "scan_unresolved": [],
+  "unsupported": [
+    {
+      "kind": "python_node",
+      "reason": "rclpy source analysis is not supported in v1 (entry point 'py_talker = py_pkg.talker:main')",
+      "declared_at": "py_pkg"
+    }
+  ],
+  "unmatched_launch_nodes": [
+    {
+      "package": "other_pkg",
+      "executable": "ghost",
+      "node_name": "ghost",
+      "reason": "no matching executable found in the workspace scan"
+    }
+  ]
+}
