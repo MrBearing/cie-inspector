@@ -4,7 +4,7 @@ Extracts the callback/CallbackGroup structure of ROS 2 nodes from source code �
 **no build, no ROS installation, no execution**.
 
 ```bash
-uvx cie-inspector extract ~/ros2_ws/src --format table
+cie-inspector extract ~/ros2_ws/src --format table
 ```
 
 ## Motivation
@@ -44,15 +44,23 @@ unaffected by remapping. Topic names are carried as reference info — declared
 
 ## Install
 
-```bash
-uvx cie-inspector --help
-```
-
-or:
+Not on PyPI yet — install from this repository. With
+[uv](https://docs.astral.sh/uv/), no clone is needed:
 
 ```bash
-pip install cie-inspector
+uvx --from git+https://github.com/MrBearing/cie-inspector cie-inspector --help
 ```
+
+From a clone:
+
+```bash
+git clone https://github.com/MrBearing/cie-inspector
+cd cie-inspector
+uv sync
+uv run cie-inspector --help
+```
+
+`pip install git+https://github.com/MrBearing/cie-inspector` works too.
 
 ## Usage
 
