@@ -1,0 +1,72 @@
+# Releasing
+
+Releases are cut by hand — nothing publishes from CI.
+
+## 1. Check
+
+```bash
+git switch main && git pull
+uv sync
+uv run ruff check . && uv run ruff format --check . && uv run pytest -q
+```
+
+Bump `version` in `pyproject.toml` if this is not the first release, and commit
+that on its own.
+
+## 2. Build
+
+```bash
+rm -rf dist
+uv build
+```
+
+`uv build` writes the sdist first and then builds the wheel *from* it, so a
+broken sdist fails here instead of after the upload.
+
+## 3. Rehearse on TestPyPI
+
+`--dry-run` validates the artifacts and the target without sending anything:
+
+```bash
+uv publish --index testpypi --dry-run
+```
+
+Then upload for real (needs a TestPyPI token — see below):
+
+```bash
+uv publish --index testpypi
+```
+
+Confirm the uploaded package installs and runs. `--index` points at TestPyPI
+while `--default-index` keeps the runtime dependencies coming from real PyPI,
+where they actually exist:
+
+```bash
+uvx --index https://test.pypi.org/simple/ \
+    --default-index https://pypi.org/simple/ \
+    --from cie-inspector cie-inspector --version
+```
+
+## 4. Publish
+
+```bash
+uv publish
+```
+
+A version can never be re-uploaded, so make sure step 3 looked right first.
+
+## 5. After the first successful upload
+
+- Rewrite the Install section of `README.md` to the plain `uvx cie-inspector …`
+  form. Until the package exists, those instructions have to stay git-based.
+- Tag it: `git tag v0.1.0 && git push origin v0.1.0`.
+
+## Tokens
+
+`uv publish` takes `--token`, or reads `UV_PUBLISH_TOKEN`. Create tokens under
+PyPI (or TestPyPI) → Account settings → API tokens; once the project exists,
+replace the account-wide token with one scoped to it.
+
+Outside CI, `uv publish` tries trusted publishing first and prints an
+`No OIDC token discovered` error before falling back to the token. Pass
+`--trusted-publishing never` to skip that.
