@@ -4,13 +4,41 @@ version = "0.1.0"
 description = "Extract ROS 2 callback/CallbackGroup structure from source code — no build, no ROS required"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Takumi Okamoto", email = "takumi1988okamoto@gmail.com" }]
+keywords = [
+    "ros2",
+    "rclcpp",
+    "callback-group",
+    "executor",
+    "static-analysis",
+    "tree-sitter",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Quality Assurance",
+]
 dependencies = [
     "click>=8.1",
     "pydantic>=2.7",
     "tree-sitter>=0.23",
     "tree-sitter-cpp>=0.23",
 ]
+
+[project.urls]
+Homepage = "https://github.com/MrBearing/cie-inspector"
+Repository = "https://github.com/MrBearing/cie-inspector"
+Issues = "https://github.com/MrBearing/cie-inspector/issues"
 
 [project.scripts]
 cie-inspector = "cie_inspector.cli:main"
@@ -28,6 +56,16 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cie_inspector"]
+
+# The sdist ships source, tests and examples. Everything below is local
+# development environment config that would only be noise for a consumer.
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.claude",
+    "/.vscode",
+    "/.github",
+    "/.python-version",
+]
 
 [tool.ruff]
 line-length = 100
