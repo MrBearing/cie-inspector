@@ -1,5 +1,9 @@
 # cie-inspector
 
+[![PyPI](https://img.shields.io/pypi/v/cie-inspector)](https://pypi.org/project/cie-inspector/)
+[![Python versions](https://img.shields.io/pypi/pyversions/cie-inspector)](https://pypi.org/project/cie-inspector/)
+[![License](https://img.shields.io/pypi/l/cie-inspector)](LICENSE)
+
 Extracts the callback/CallbackGroup structure of ROS 2 nodes from source code —
 **no build, no ROS installation, no execution**.
 
@@ -44,23 +48,20 @@ unaffected by remapping. Topic names are carried as reference info — declared
 
 ## Install
 
-Not on PyPI yet — install from this repository. With
-[uv](https://docs.astral.sh/uv/), no clone is needed:
+Run it without installing anything, via [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uvx --from git+https://github.com/MrBearing/cie-inspector cie-inspector --help
+uvx cie-inspector --help
 ```
 
-From a clone:
+Or install it:
 
 ```bash
-git clone https://github.com/MrBearing/cie-inspector
-cd cie-inspector
-uv sync
-uv run cie-inspector --help
+uv tool install cie-inspector   # or: pip install cie-inspector
 ```
 
-`pip install git+https://github.com/MrBearing/cie-inspector` works too.
+To work on the tool itself, see [RELEASING.md](RELEASING.md) and the
+Development section below.
 
 ## Usage
 
