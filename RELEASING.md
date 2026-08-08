@@ -37,15 +37,32 @@ Then upload for real (needs a TestPyPI token — see below):
 uv publish --index testpypi
 ```
 
-Confirm the uploaded package installs and runs. `--index` points at TestPyPI
-while `--default-index` keeps the runtime dependencies coming from real PyPI,
-where they actually exist:
+Confirm the uploaded package installs and runs. Install it by its TestPyPI
+URL — that pins the artifact you just uploaded while every dependency still
+resolves from real PyPI:
 
 ```bash
-uvx --index https://test.pypi.org/simple/ \
-    --default-index https://pypi.org/simple/ \
-    --from cie-inspector cie-inspector --version
+WHEEL=$(curl -s https://test.pypi.org/pypi/cie-inspector/json \
+  | python3 -c "import json,sys; print(next(u['url'] for u in json.load(sys.stdin)['urls'] if u['filename'].endswith('.whl')))")
+
+uvx --from "cie-inspector @ $WHEEL" cie-inspector --version
+uvx --from "cie-inspector @ $WHEEL" cie-inspector extract tests/fixtures/ws_basic --format table
 ```
+
+Do **not** reach for the obvious `--index https://test.pypi.org/simple/
+--default-index https://pypi.org/simple/` form. uv's default index strategy
+(`first-index`) pins every package to the first index it appears on, and
+TestPyPI happens to carry stale copies of some dependencies — `pydantic` is
+one — so resolution fails with a misleading message blaming `cie-inspector`:
+
+```
+Because cie-inspector was not found in the package registry and you require
+cie-inspector, we can conclude that your requirements are unsatisfiable.
+```
+
+`--index-strategy unsafe-best-match` also works, but it switches off the
+dependency-confusion protection for the whole resolution. The URL form above
+does not, so prefer it.
 
 ## 4. Publish
 
