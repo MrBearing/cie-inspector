@@ -72,11 +72,23 @@ uv publish
 
 A version can never be re-uploaded, so make sure step 3 looked right first.
 
-## 5. After the first successful upload
+## 5. After a successful upload
 
-- Rewrite the Install section of `README.md` to the plain `uvx cie-inspector …`
-  form. Until the package exists, those instructions have to stay git-based.
-- Tag it: `git tag v0.1.0 && git push origin v0.1.0`.
+Tag the released commit:
+
+```bash
+git tag v0.1.0 && git push origin v0.1.0
+```
+
+Then confirm the published artifact from a clean machine's point of view:
+
+```bash
+uvx cie-inspector --version
+```
+
+Never describe an install path in the README before it works. The first
+release shipped instructions for `uvx cie-inspector` only once that command
+had actually been run against PyPI.
 
 ## Tokens
 
