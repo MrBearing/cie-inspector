@@ -1,45 +1,63 @@
 # Releasing
 
-Releases are cut by hand — nothing publishes from CI.
+Releases go out from CI. Publishing a GitHub Release is the trigger:
+[`.github/workflows/release.yml`](.github/workflows/release.yml) re-runs the
+checks, builds, and uploads to PyPI with trusted publishing — no token is
+stored anywhere.
 
-## 1. Check
+## One-time setup
 
-```bash
-git switch main && git pull
-uv sync
-uv run ruff check . && uv run ruff format --check . && uv run pytest -q
-```
+Register this workflow as a trusted publisher at
+<https://pypi.org/manage/project/cie-inspector/settings/publishing/>:
 
-Bump `version` in `pyproject.toml` if this is not the first release, and commit
-that on its own.
+| Field | Value |
+| --- | --- |
+| Owner | `MrBearing` |
+| Repository name | `cie-inspector` |
+| Workflow name | `release.yml` |
+| Environment name | *(leave empty)* |
 
-## 2. Build
+The workflow declares no environment, so that field has to stay blank or the
+OIDC exchange will not match. Do the same at
+<https://test.pypi.org/manage/project/cie-inspector/settings/publishing/> to
+enable the TestPyPI rehearsal below.
 
-```bash
-rm -rf dist
-uv build
-```
+## Cutting a release
 
-`uv build` writes the sdist first and then builds the wheel *from* it, so a
-broken sdist fails here instead of after the upload.
+1. **Bump the version** in `pyproject.toml` (`uv version --bump patch|minor|major`)
+   and merge that on its own.
 
-## 3. Rehearse on TestPyPI
+2. **Tag the commit** you want to release:
 
-`--dry-run` validates the artifacts and the target without sending anything:
+   ```bash
+   git switch main && git pull
+   git tag -a v0.2.0 -m "cie-inspector 0.2.0" && git push origin v0.2.0
+   ```
 
-```bash
-uv publish --index testpypi --dry-run
-```
+3. **Draft a GitHub Release** against that tag, write the notes, and press
+   **Publish**. That starts the workflow.
 
-Then upload for real (needs a TestPyPI token — see below):
+4. **Watch it.** The build job refuses to continue if the tag disagrees with
+   the version in `pyproject.toml` — PyPI never lets a version number be
+   reused, so this guard exists to stop a wrong number going out.
 
-```bash
-uv publish --index testpypi
-```
+5. **Verify** once it is green:
 
-Confirm the uploaded package installs and runs. Install it by its TestPyPI
-URL — that pins the artifact you just uploaded while every dependency still
-resolves from real PyPI:
+   ```bash
+   uvx cie-inspector@latest --version
+   ```
+
+The workflow attaches the sdist and wheel to the GitHub Release, so the files
+on the release page are the exact ones that were tested and uploaded.
+
+## Rehearsing on TestPyPI
+
+Run the workflow manually — Actions → Release → *Run workflow* — with the
+target set to `testpypi`. It builds from the selected branch and uploads
+there without touching PyPI or creating a release.
+
+To check what landed, install it by URL. Dependencies then still resolve from
+real PyPI:
 
 ```bash
 WHEEL=$(curl -s https://test.pypi.org/pypi/cie-inspector/json \
@@ -64,38 +82,27 @@ cie-inspector, we can conclude that your requirements are unsatisfiable.
 dependency-confusion protection for the whole resolution. The URL form above
 does not, so prefer it.
 
-## 4. Publish
+## Publishing by hand
+
+Only needed if CI is unavailable. The `testpypi` index is already configured
+in `pyproject.toml`:
 
 ```bash
-uv publish
+rm -rf dist && uv build
+uv publish --index testpypi --dry-run   # validates without uploading
+uv publish --index testpypi             # needs a TestPyPI token
+uv publish                              # needs a PyPI token
 ```
 
-A version can never be re-uploaded, so make sure step 3 looked right first.
+`uv publish` takes `--token`, or reads `UV_PUBLISH_TOKEN`. TestPyPI and PyPI
+are separate services with separate accounts and tokens — a token from one
+returns `403 Invalid or non-existent authentication information` on the other.
 
-## 5. After a successful upload
-
-Tag the released commit:
-
-```bash
-git tag v0.1.0 && git push origin v0.1.0
-```
-
-Then confirm the published artifact from a clean machine's point of view:
-
-```bash
-uvx cie-inspector --version
-```
-
-Never describe an install path in the README before it works. The first
-release shipped instructions for `uvx cie-inspector` only once that command
-had actually been run against PyPI.
-
-## Tokens
-
-`uv publish` takes `--token`, or reads `UV_PUBLISH_TOKEN`. Create tokens under
-PyPI (or TestPyPI) → Account settings → API tokens; once the project exists,
-replace the account-wide token with one scoped to it.
-
-Outside CI, `uv publish` tries trusted publishing first and prints an
-`No OIDC token discovered` error before falling back to the token. Pass
+Outside CI, `uv publish` tries trusted publishing first and prints
+`No OIDC token discovered` before falling back to the token. Pass
 `--trusted-publishing never` to skip that.
+
+## Rule
+
+Never describe an install path anywhere — README, release notes, blog posts —
+before it has actually been run against the published package.
